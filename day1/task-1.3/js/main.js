@@ -1,0 +1,30 @@
+import { isEmpty, isValidName, isEmail, getGrade } from "./validation.js";
+
+console.log("=== Проверка isEmail ===");
+console.log('"" :', isEmail(""));
+console.log('"   " :', isEmail("   "));
+console.log('"a@b" :', isEmail("a@b"));
+console.log('"a@b." :', isEmail("a@b."));
+console.log('"a@b.c" :', isEmail("a@b.c"));
+console.log('" name@example.com " :', isEmail(" name@example.com "));
+console.log('"имя@почта.рф" :', isEmail("имя@почта.рф"));
+console.log('"a@@b.ru" :', isEmail("a@@b.ru"));
+
+console.log("=== Проверка getGrade ===");
+console.log("0 :", getGrade(0));
+console.log("59 :", getGrade(59));
+console.log("60 :", getGrade(60));
+console.log("74 :", getGrade(74));
+console.log("74.5 :", getGrade(74.5));
+console.log("75 :", getGrade(75));
+console.log("89 :", getGrade(89));
+console.log("90 :", getGrade(90));
+console.log("100 :", getGrade(100));
+console.log("-1 :", getGrade(-1));
+console.log("101 :", getGrade(101));
+console.log('"80" :', getGrade("80"));
+console.log('"" :', getGrade(""));
+console.log('"   " :', getGrade("   "));
+console.log('"abc" :', getGrade("abc"));
+console.log("null :", getGrade(null));
+console.log("true :", getGrade(true));
