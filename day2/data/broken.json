@@ -54,7 +54,7 @@
     "price": 18990,
     "inStock": true,
     "rating": 5
-  },
+  }
   {
     "id": 8,
     "title": "Портативный монитор",
@@ -62,5 +62,5 @@
     "price": 12490,
     "inStock": true,
     "rating": 4
-  }
+  },
 ]
