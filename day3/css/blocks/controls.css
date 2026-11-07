@@ -1,0 +1,34 @@
+.controls {
+  display: flex;
+  gap: var(--space-m);
+  align-items: flex-end;
+  margin-bottom: var(--space-l);
+  flex-wrap: wrap;
+}
+
+.controls .field {
+  flex: 1;
+  min-width: 200px;
+  margin-bottom: 0;
+}
+
+.refresh-button {
+  padding: var(--space-s) var(--space-m);
+  background-color: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius-m);
+  cursor: pointer;
+  font-size: var(--font-size-m);
+  transition: background-color 0.2s;
+  white-space: nowrap;
+}
+
+.refresh-button:hover:not(:disabled) {
+  background-color: #0056b3;
+}
+
+.refresh-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
