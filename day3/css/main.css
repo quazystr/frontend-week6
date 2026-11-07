@@ -1,0 +1,17 @@
+@import "base/variables.css";
+@import "base/base.css";
+
+@import "blocks/header.css";
+@import "blocks/button.css";
+@import "blocks/field.css";
+@import "blocks/check.css";
+@import "blocks/badge.css";
+@import "blocks/alert.css";
+@import "blocks/filters.css";
+@import "blocks/task-list.css";
+@import "blocks/task.css";
+@import "blocks/counter.css";
+@import "blocks/empty.css";
+@import "blocks/status.css";
+@import "blocks/card-list.css";
+@import "blocks/card.css";

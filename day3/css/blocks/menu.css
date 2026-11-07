@@ -1,0 +1,36 @@
+.menu {
+  display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+@media (max-width: 360px) {
+  .menu {
+    flex-direction: column;
+  }
+}
+
+.menu__item {
+  padding-left: var(--space-s);
+}
+
+.menu__link {
+  color: var(--color-primary);
+}
+
+.menu__link:hover {
+  filter: brightness(120%);
+}
+
+.menu__link:focus-visible {
+  outline: 2px solid;
+  outline-offset: 2px;
+}
+
+.menu__link--current {
+  font-weight: bold;
+  color: var(--color-warning);
+  pointer-events: none;
+  cursor: default;
+}

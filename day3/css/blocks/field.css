@@ -1,0 +1,27 @@
+.field {
+  margin-bottom: var(--space-m);
+}
+.field__label {
+  display: block;
+  margin-bottom: var(--space-s);
+  font-weight: 500;
+}
+.field__control {
+  width: 80%;
+  padding: var(--space-s);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-m);
+  font-size: var(--font-size-m);
+}
+.field__hint {
+  font-size: 14px;
+  color: var(--color-secondary);
+  margin-top: 4px;
+  min-height: 1.4em;
+}
+.field--error .field__control {
+  border-color: var(--color-danger);
+}
+.field--error .field__hint {
+  color: var(--color-danger);
+}

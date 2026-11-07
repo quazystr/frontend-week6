@@ -1,0 +1,55 @@
+:root {
+  --color-bg: rgb(240, 239, 239);
+  --color-primary: rgb(90, 89, 148);
+  --color-secondary: rgb(24, 59, 183);
+  --color-success: rgb(4, 145, 21);
+  --color-warning: rgb(233, 139, 56);
+  --color-danger: rgb(182, 27, 27);
+  --color-info: rgb(109, 34, 110);
+  --color-light: rgb(233, 233, 233);
+  --color-dark: rgb(42, 41, 41);
+  --color-border: black;
+  --color-border-secondary: rgb(24, 59, 183);
+  --color-border-success: rgb(32, 215, 53);
+  --color-border-danger: rgb(246, 43, 43);
+
+  --space-xs: 4px;
+  --space-s: 8px;
+  --space-m: 16px;
+  --space-l: 24px;
+  --space-xl: 32px;
+
+  --font-size-s: 14px;
+  --font-size-m: 16px;
+  --font-size-l: 20px;
+
+  --radius-s: 4px;
+  --radius-m: 8px;
+}
+
+.page--dark {
+  --color-bg: rgb(25, 25, 30);
+  --color-light: rgb(50, 50, 55);
+  --color-dark: rgb(235, 235, 240);
+
+  --color-primary: rgb(150, 150, 210);
+  --color-secondary: rgb(90, 130, 225);
+  --color-success: rgb(90, 210, 110);
+  --color-warning: rgb(245, 175, 95);
+  --color-danger: rgb(225, 90, 90);
+  --color-info: rgb(175, 110, 180);
+  --color-border: rgb(80, 80, 85);
+  --color-border-secondary: rgb(90, 130, 225);
+  --color-border-success: rgb(90, 210, 110);
+  --color-border-danger: rgb(225, 90, 90);
+}
+
+.page {
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
+  min-height: 100vh;
+  margin: 0;
+}

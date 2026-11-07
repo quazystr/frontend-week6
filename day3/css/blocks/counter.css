@@ -1,0 +1,46 @@
+.counter {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-s);
+  padding: var(--space-m);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-m);
+  background: var(--color-bg);
+}
+
+.counter__value {
+  font-size: var(--font-size-l);
+  font-weight: bold;
+  min-width: 40px;
+  text-align: center;
+  color: var(--color-dark);
+  transition: color 0.2s;
+}
+
+.counter__value--max {
+  color: var(--color-danger);
+}
+
+.counter__button {
+  padding: var(--space-s) var(--space-m);
+  border: 1px solid var(--color-border);
+  border-radius: var(--space-xs);
+  background: var(--color-bg);
+  cursor: pointer;
+  font-size: var(--font-size-m);
+}
+
+.counter__button:hover:not(:disabled) {
+  filter: brightness(120%);
+}
+
+.counter__button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.counter__button--reset {
+  margin-left: var(--space-s);
+  border-color: var(--color-border-secondary);
+  color: var(--color-secondary);
+}
