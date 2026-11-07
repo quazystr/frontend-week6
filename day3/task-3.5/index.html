@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Task 3.5</title>
+    <link rel="stylesheet" href="../css/main.css" />
+  </head>
+  <body>
+    <header class="header">
+      <a href="/" class="header__logo">Список пользователей</a>
+    </header>
+
+    <main class="main-content">
+      <h1>Пользователи</h1>
+
+      <div class="controls">
+        <div class="field source">
+          <label class="field__label" for="data-source">Источник данных</label>
+          <select class="field__control source__control" id="data-source">
+            <option value="https://jsonplaceholder.typicode.com/users">
+              Внешний API (JSONPlaceholder)
+            </option>
+            <option value="../data/users.json">
+              Локальный файл (с ошибками)
+            </option>
+          </select>
+        </div>
+
+        <button class="button refresh-button" id="refresh-btn" type="button">
+          Обновить
+        </button>
+      </div>
+
+      <div class="status" role="status" hidden>
+        <p class="status__text"></p>
+        <button class="status__retry button" type="button" hidden>
+          Повторить
+        </button>
+      </div>
+
+      <div class="empty" hidden>
+        <p class="empty__text">Пользователи не найдены</p>
+      </div>
+
+      <ul class="card-list" hidden></ul>
+
+      <template class="user-template">
+        <li class="card">
+          <h3 class="card__name"></h3>
+          <p class="card__email"></p>
+          <p class="card__city"></p>
+          <p class="card__company"></p>
+        </li>
+      </template>
+    </main>
+
+    <script type="module" src="js/main.js"></script>
+  </body>
+</html>
