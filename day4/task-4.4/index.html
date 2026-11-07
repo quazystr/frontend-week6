@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Task 4.4</title>
+    <link rel="stylesheet" href="../css/main.css" />
+  </head>
+  <body>
+    <header class="header">
+      <a href="/" class="header__logo">Поиск постов</a>
+    </header>
+
+    <main class="main-content">
+      <h1>Поиск по постам</h1>
+
+      <!-- Поле поиска -->
+      <div class="field">
+        <label class="field__label" for="search-input">Введите запрос</label>
+        <input
+          class="field__control"
+          id="search-input"
+          type="text"
+          placeholder="Например: dolor"
+        />
+        <div class="field__hint" id="search-hint"></div>
+      </div>
+
+      <!-- Блок состояния (загрузка или ошибка) -->
+      <div class="status" role="status" hidden>
+        <p class="status__text" id="status-text"></p>
+      </div>
+
+      <!-- Список результатов -->
+      <ul class="card-list" id="results-list" hidden></ul>
+
+      <!-- Шаблон карточки поста -->
+      <template id="post-template">
+        <li class="card">
+          <h3 class="card__title"></h3>
+          <p class="card__text"></p>
+        </li>
+      </template>
+    </main>
+
+    <script type="module" src="js/main.js"></script>
+  </body>
+</html>
