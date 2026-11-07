@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Task 4.3</title>
+    <link rel="stylesheet" href="../css/main.css" />
+  </head>
+  <body>
+    <header class="header">
+      <a href="/" class="header__logo">Массовая загрузка</a>
+    </header>
+
+    <main class="main-content">
+      <h1>Загрузка фотографий</h1>
+
+      <button class="button" id="load-btn" type="button">Загрузить фото</button>
+
+      <!-- Блок состояния: загрузка или ошибка -->
+      <div class="status" role="status" hidden>
+        <p class="status__text"></p>
+        <button
+          class="status__retry button"
+          id="retry-btn"
+          type="button"
+          hidden
+        >
+          Повторить
+        </button>
+      </div>
+
+      <!-- Блок успешного результата -->
+      <div class="result" id="result" hidden>
+        <p class="result__text" id="result-text"></p>
+      </div>
+    </main>
+
+    <script type="module" src="js/main.js"></script>
+  </body>
+</html>
