@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Task 3.3</title>
+    <link rel="stylesheet" href="../css/main.css" />
+  </head>
+  <body>
+    <header class="header">
+      <a href="/" class="header__logo">Каталог товаров</a>
+    </header>
+
+    <main class="main-content">
+      <h1>Каталог товаров</h1>
+
+      <!-- Служебный select: источник данных -->
+      <div class="field source">
+        <label class="field__label" for="data-source">Источник данных</label>
+        <select class="field__control source__control" id="data-source">
+          <option value="../data/products.json">products.json</option>
+          <option value="../data/missing.json">missing.json</option>
+          <option value="../data/broken.json">broken.json</option>
+          <option value="../data/empty.json">empty.json</option>
+          <option value="../data/object.json">object.json</option>
+        </select>
+      </div>
+
+      <!-- Состояние: загрузка / ошибка -->
+      <div class="status" role="status" hidden>
+        <p class="status__text"></p>
+        <button class="status__retry button" type="button" hidden>
+          Повторить
+        </button>
+      </div>
+
+      <!-- Пустой результат -->
+      <div class="empty" hidden>
+        <p class="empty__text">Товаров нет</p>
+      </div>
+
+      <!-- Список карточек -->
+      <ul class="card-list" hidden></ul>
+
+      <!-- Шаблон карточки -->
+      <template class="product-template">
+        <li class="card">
+          <h3 class="card__title"></h3>
+          <p class="card__text"></p>
+          <p class="card__price"></p>
+        </li>
+      </template>
+    </main>
+
+    <script type="module" src="js/main.js"></script>
+  </body>
+</html>
