@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Task 4.2</title>
+    <link rel="stylesheet" href="../css/main.css" />
+  </head>
+  <body>
+    <header class="header">
+      <a href="/" class="header__logo">Мои задачи</a>
+    </header>
+
+    <main class="main-content">
+      <h1>Список задач</h1>
+
+      <!-- Блок для сообщений об ошибках действий -->
+      <div class="alert alert--danger" id="action-alert" role="alert" hidden>
+        <p class="alert__text" id="action-alert-text"></p>
+      </div>
+
+      <!-- Список задач (сюда вешаем делегирование) -->
+      <ul class="task-list" id="task-list"></ul>
+
+      <!-- Шаблон задачи -->
+      <template id="task-template">
+        <li class="task">
+          <input
+            class="task__check"
+            type="checkbox"
+            aria-label="Изменить статус задачи"
+          />
+          <h3 class="task__title"></h3>
+          <button
+            class="task__remove"
+            type="button"
+            aria-label="Удалить задачу"
+          >
+            ×
+          </button>
+        </li>
+      </template>
+    </main>
+
+    <script type="module" src="js/main.js"></script>
+  </body>
+</html>
