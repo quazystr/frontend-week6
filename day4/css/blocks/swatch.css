@@ -1,0 +1,34 @@
+.swatch {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: var(--space-l);
+}
+
+.swatch--primary {
+  background-color: var(--color-primary);
+  color: var(--color-light);
+}
+.swatch--secondary {
+  background-color: var(--color-secondary);
+  color: var(--color-light);
+}
+.swatch--success {
+  background-color: var(--color-success);
+}
+.swatch--danger {
+  background-color: var(--color-danger);
+}
+.swatch--warning {
+  background-color: var(--color-warning);
+}
+.swatch--info {
+  background-color: var(--color-info);
+  color: var(--color-light);
+}
+.swatch--light {
+  background-color: var(--color-light);
+}
+.swatch--dark {
+  background-color: var(--color-dark);
+  color: var(--color-light);
+}

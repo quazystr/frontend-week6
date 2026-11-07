@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Task 4.1</title>
+    <link rel="stylesheet" href="../css/main.css" />
+  </head>
+  <body>
+    <header class="header">
+      <a href="/" class="header__logo">Создание поста</a>
+    </header>
+
+    <main class="main-content">
+      <h1>Новый пост</h1>
+
+      <!-- Блок алерта (успех или ошибка) -->
+      <div class="alert" id="form-alert" role="alert" hidden>
+        <p class="alert__text" id="alert-text"></p>
+      </div>
+
+      <form id="post-form" novalidate>
+        <div class="field" id="field-title">
+          <label class="field__label" for="post-title">Заголовок</label>
+          <input class="field__control" id="post-title" type="text" required />
+          <div class="field__hint" id="hint-title"></div>
+        </div>
+
+        <div class="field" id="field-body">
+          <label class="field__label" for="post-body">Текст поста</label>
+          <textarea
+            class="field__control"
+            id="post-body"
+            rows="5"
+            required
+          ></textarea>
+          <div class="field__hint" id="hint-body"></div>
+        </div>
+
+        <button class="button" type="submit" id="submit-btn">
+          Опубликовать
+        </button>
+      </form>
+    </main>
+
+    <script type="module" src="js/main.js"></script>
+  </body>
+</html>
