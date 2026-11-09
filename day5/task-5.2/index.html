@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Task 5.2</title>
+    <link rel="stylesheet" href="../css/main.css" />
+  </head>
+  <body>
+    <header class="header">
+      <a href="/" class="header__logo">Каталог товаров</a>
+    </header>
+
+    <main class="main-content">
+      <h1>Каталог товаров</h1>
+
+      <!-- Алерт кэша (показывается только при успехе из кэша) -->
+      <div class="alert alert--warning" id="cache-alert" role="alert" hidden>
+        <p class="alert__text" id="cache-alert-text"></p>
+      </div>
+
+      <!-- Блок состояния (загрузка или полная ошибка) -->
+      <div class="status" role="status" hidden>
+        <p class="status__text" id="status-text"></p>
+        <button
+          class="status__retry button"
+          id="retry-btn"
+          type="button"
+          hidden
+        >
+          Повторить
+        </button>
+      </div>
+
+      <!-- Список карточек -->
+      <ul class="card-list" id="card-list" hidden></ul>
+
+      <!-- Шаблон карточки -->
+      <template id="product-template">
+        <li class="card">
+          <h3 class="card__title"></h3>
+          <p class="card__text"></p>
+          <p class="card__price"></p>
+        </li>
+      </template>
+    </main>
+
+    <script type="module" src="js/main.js"></script>
+  </body>
+</html>
