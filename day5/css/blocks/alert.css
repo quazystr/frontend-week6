@@ -11,6 +11,12 @@
   border-left-color: var(--color-success);
 }
 
+.alert--warning {
+  background-color: #fff3cd;
+  color: #856404;
+  border-left-color: var(--color-warning);
+}
+
 .alert--danger {
   background-color: #f8d7da;
   color: #842029;
