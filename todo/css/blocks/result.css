@@ -1,0 +1,18 @@
+.result {
+  padding: var(--space-l);
+  text-align: center;
+  border-radius: var(--radius-m);
+  margin: var(--space-l) 0;
+  background-color: #e8f5e9;
+  color: #2e7d32;
+}
+
+.result__text {
+  margin: 0;
+  font-size: var(--font-size-m);
+  font-weight: bold;
+}
+
+.result[hidden] {
+  display: none;
+}

@@ -1,0 +1,28 @@
+.alert {
+  padding: var(--space-m);
+  border-radius: var(--radius-m);
+  margin-bottom: var(--space-m);
+  border-left: 4px solid transparent;
+}
+
+.alert--success {
+  background-color: #d1e7dd;
+  color: #0f5132;
+  border-left-color: var(--color-success);
+}
+
+.alert--warning {
+  background-color: #fff3cd;
+  color: #856404;
+  border-left-color: var(--color-warning);
+}
+
+.alert--danger {
+  background-color: #f8d7da;
+  color: #842029;
+  border-left-color: var(--color-danger);
+}
+
+.alert[hidden] {
+  display: none;
+}

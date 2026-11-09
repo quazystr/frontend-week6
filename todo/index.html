@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Список задач</title>
+    <link rel="stylesheet" href="css/main.css" />
+  </head>
+  <body>
+    <header class="header">
+      <a href="/" class="header__logo">Todo App</a>
+    </header>
+
+    <main class="main-content">
+      <!-- Блок status: загрузка стартовых данных или импорт -->
+      <div class="status" id="status" role="status" hidden>
+        <p class="status__text" id="status-text"></p>
+        <button
+          class="status__retry button"
+          id="retry-btn"
+          type="button"
+          hidden
+        >
+          Повторить
+        </button>
+      </div>
+
+      <!-- Alert: уведомления об ошибках импорта и других действиях -->
+      <div class="alert" id="action-alert" role="alert" hidden>
+        <p class="alert__text" id="alert-text"></p>
+      </div>
+
+      <!-- Форма добавления задачи -->
+      <form class="task-form" novalidate>
+        <div class="field">
+          <label class="field__label" for="task-title">Новая задача</label>
+          <input
+            class="field__control"
+            id="task-title"
+            name="title"
+            type="text"
+            placeholder="Например: Купить молоко"
+            required
+            maxlength="100"
+            aria-describedby="task-title-hint"
+          />
+          <div id="task-title-hint" class="field__hint"></div>
+        </div>
+
+        <div class="task-form__actions">
+          <button class="button button--primary" type="submit">
+            Добавить задачу
+          </button>
+          <button class="button button--secondary import-btn" type="button">
+            Импортировать задачи
+          </button>
+        </div>
+      </form>
+
+      <hr class="divider" />
+
+      <!-- Фильтры -->
+      <div class="filters" role="group" aria-label="Фильтры задач">
+        <button
+          class="filters__button filters__button--active"
+          data-filter="all"
+          aria-pressed="true"
+        >
+          Все
+        </button>
+        <button
+          class="filters__button"
+          data-filter="active"
+          aria-pressed="false"
+        >
+          Активные
+        </button>
+        <button class="filters__button" data-filter="done" aria-pressed="false">
+          Выполненные
+        </button>
+      </div>
+
+      <div class="filters__actions">
+        <button class="button button--secondary clear-done-btn" disabled>
+          Удалить выполненные
+        </button>
+      </div>
+
+      <!-- Счетчик -->
+      <div class="counter">Осталось: 0 из 0</div>
+
+      <!-- Пустое состояние -->
+      <div class="empty" hidden>
+        <p>Список задач пуст. Добавьте первую задачу!</p>
+      </div>
+
+      <!-- Список задач -->
+      <ul class="task-list"></ul>
+
+      <!-- Шаблон задачи -->
+      <template class="task-template">
+        <li class="task">
+          <input
+            class="task__check"
+            type="checkbox"
+            aria-label="Отметить как выполненную"
+          />
+          <h3 class="task__title"></h3>
+          <span class="badge"></span>
+          <button
+            class="task__remove"
+            type="button"
+            aria-label="Удалить задачу"
+          >
+            ×
+          </button>
+        </li>
+      </template>
+    </main>
+
+    <!-- Подключение как модуль -->
+    <script type="module" src="js/main.js"></script>
+  </body>
+</html>
