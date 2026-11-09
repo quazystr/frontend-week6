@@ -1,0 +1,17 @@
+.showcase {
+  padding: var(--space-xl) var(--space-m);
+  border-bottom: 1px solid var(--color-light);
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.showcase__title {
+  font-size: var(--fond-size-l);
+  margin-bottom: var(--space-s);
+}
+
+.showcase__text {
+  font-size: var(--fond-size-m);
+  color: var(--color-dark);
+  margin-bottom: var(--space-xl);
+}
