@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Task 5.1</title>
+    <link rel="stylesheet" href="../css/main.css" />
+  </head>
+  <body>
+    <header class="header">
+      <a href="/" class="header__logo">Профили пользователей</a>
+    </header>
+
+    <main class="main-content">
+      <h1>Карточка пользователя</h1>
+
+      <!-- Выбор пользователя -->
+      <div class="field">
+        <label class="field__label" for="user-select"
+          >Выберите пользователя</label
+        >
+        <select class="field__control" id="user-select" disabled>
+          <option value="">Загрузка списка...</option>
+        </select>
+      </div>
+
+      <!-- Блок состояния (загрузка или ошибка) -->
+      <div class="status" role="status" hidden>
+        <p class="status__text" id="status-text"></p>
+        <button
+          class="status__retry button"
+          id="retry-btn"
+          type="button"
+          hidden
+        >
+          Повторить
+        </button>
+      </div>
+
+      <!-- Карточка пользователя -->
+      <div class="card" id="user-card" hidden>
+        <h2 class="card__title" id="card-name"></h2>
+        <p><strong>Email:</strong> <span id="card-email"></span></p>
+        <p><strong>Город:</strong> <span id="card-city"></span></p>
+        <p><strong>Компания:</strong> <span id="card-company"></span></p>
+        <p class="card__todos" id="card-todos"></p>
+      </div>
+    </main>
+
+    <script type="module" src="js/main.js"></script>
+  </body>
+</html>
