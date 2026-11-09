@@ -1,0 +1,28 @@
+[
+  {
+    "id": 1,
+    "name": "Леанн Грэм",
+    "email": "Sincere@april.biz",
+    "address": { "city": "Гвенборо" }
+  },
+  {
+    "id": 2,
+    "name": "Эрвин Хауэлл",
+    "email": "Shanna@melissa.tv",
+    "address": { "city": "Високиберг" }
+  },
+  {
+    "id": 3,
+    "name": "Клементина Баух",
+    "email": null,
+    "address": { "city": "Маккензихейвен" },
+    "company": { "name": "Ромагуера-Джейкобсон" }
+  },
+  {
+    "id": 4,
+    "name": "<b>Имя</b>",
+    "email": "Julianne.OConner@kory.org",
+    "address": { "city": "Росковью" },
+    "company": { "name": "Киблир LLC" }
+  }
+]
