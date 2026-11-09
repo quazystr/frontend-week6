@@ -1,5 +1,10 @@
 const STORAGE_KEY = "week6:todo-tasks";
 
+// Проверяет, существует ли ключ вообще (даже если там '[]')
+export function hasTasksInStorage() {
+  return localStorage.getItem(STORAGE_KEY) !== null;
+}
+
 export function loadTasks() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);

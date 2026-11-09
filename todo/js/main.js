@@ -1,15 +1,22 @@
-import { loadTasks, saveTasks } from "./storage.js";
+import { hasTasksInStorage, loadTasks, saveTasks } from "./storage.js";
 import {
   getTasks,
   getFilter,
+  getStatus,
   setInitialTasks,
+  setFilter,
+  setStatus,
   addTask,
   toggleTask,
   deleteTask,
-  setFilter,
   clearCompleted,
 } from "./state.js";
-import { renderTasks, renderCounter, renderEmptyState } from "./render.js";
+import {
+  renderTasks,
+  renderCounter,
+  renderEmptyState,
+  renderStatusBlock,
+} from "./render.js";
 import {
   isValidTitle,
   isValidTask,
@@ -17,7 +24,7 @@ import {
 } from "./validation.js";
 import { loadInitialTasks, importFromExternalApi } from "./api.js";
 
-// DOM-элементы
+// DOM
 const form = document.querySelector(".task-form");
 const titleInput = document.getElementById("task-title");
 const taskList = document.querySelector(".task-list");
@@ -26,43 +33,61 @@ const counter = document.querySelector(".counter");
 const emptyState = document.querySelector(".empty");
 const filters = document.querySelector(".filters");
 const clearDoneBtn = document.querySelector(".clear-done-btn");
-const importBtn = document.querySelector(".import-btn"); // Убедись, что эта кнопка есть в HTML
+const importBtn = document.querySelector(".import-btn");
+const retryBtn = document.getElementById("retry-btn");
 
-// Функция обновления всего UI
+// Обновление всего UI
 function updateUI() {
   renderTasks(getTasks(), getFilter(), taskList, taskTemplate);
   renderCounter(getTasks(), counter);
   renderEmptyState(getTasks(), getFilter(), emptyState);
-  saveTasks(getTasks()); // Сохраняем после любого изменения
+  renderStatusBlock(getStatus(), window.errorMessage || ""); // Передаем текущий статус
 
   const hasCompleted = getTasks().some((t) => t.done);
   clearDoneBtn.disabled = !hasCompleted;
+
+  // Сохраняем при любом изменении
+  saveTasks(getTasks());
 }
 
-// Инициализация
-async function init() {
-  let tasks = loadTasks();
+// Логика загрузки стартовых задач
+async function fetchInitialTasks() {
+  setStatus("loading");
+  updateUI(); // Показываем "Загрузка...", форма при этом остается активной
 
-  // Фильтруем на случай, если в хранилище попал мусор
-  tasks = tasks.filter(isValidTask);
+  try {
+    const rawTasks = await loadInitialTasks();
+    const validTasks = rawTasks.filter(isValidTask);
 
-  if (tasks.length === 0) {
-    try {
-      const initialTasks = await loadInitialTasks();
-      tasks = initialTasks.filter(isValidTask);
-      setInitialTasks(tasks);
-      saveTasks(tasks);
-    } catch (error) {
-      console.error("Ошибка загрузки стартовых задач:", error);
-    }
-  } else {
-    setInitialTasks(tasks);
+    setInitialTasks(validTasks);
+    saveTasks(validTasks);
+
+    setStatus("idle");
+    updateUI();
+  } catch (error) {
+    console.error("Ошибка загрузки стартовых задач:", error);
+    setStatus("error", "Не удалось загрузить стартовые задачи");
+    setInitialTasks([]); // Приложение работает с пустым списком
+    updateUI();
   }
-
-  updateUI();
 }
 
-// Обработчики событий
+// Инициализация приложения
+async function init() {
+  // КЛЮЧЕВОЕ УСЛОВИЕ: если ключа нет ВОВСЕ
+  if (!hasTasksInStorage()) {
+    await fetchInitialTasks();
+  } else {
+    // Ключ есть (даже если там '[]') - не запрашиваем сервер
+    const savedTasks = loadTasks().filter(isValidTask);
+    setInitialTasks(savedTasks);
+    setStatus("idle");
+    updateUI();
+  }
+}
+
+// --- Обработчики событий ---
+
 form.addEventListener("submit", (event) => {
   event.preventDefault();
   const title = titleInput.value;
@@ -83,8 +108,7 @@ form.addEventListener("submit", (event) => {
 taskList.addEventListener("change", (event) => {
   const checkbox = event.target.closest(".task__check");
   if (checkbox) {
-    const taskId = checkbox.closest(".task").dataset.id;
-    toggleTask(taskId);
+    toggleTask(checkbox.closest(".task").dataset.id);
     updateUI();
   }
 });
@@ -92,8 +116,7 @@ taskList.addEventListener("change", (event) => {
 taskList.addEventListener("click", (event) => {
   const removeBtn = event.target.closest(".task__remove");
   if (removeBtn) {
-    const taskId = removeBtn.closest(".task").dataset.id;
-    deleteTask(taskId);
+    deleteTask(removeBtn.closest(".task").dataset.id);
     updateUI();
   }
 });
@@ -101,13 +124,10 @@ taskList.addEventListener("click", (event) => {
 filters.addEventListener("click", (event) => {
   const btn = event.target.closest(".filters__button");
   if (btn) {
-    // Сброс активных классов
     document.querySelectorAll(".filters__button").forEach((b) => {
       b.classList.remove("filters__button--active");
       b.setAttribute("aria-pressed", "false");
     });
-
-    // Установка нового фильтра
     btn.classList.add("filters__button--active");
     btn.setAttribute("aria-pressed", "true");
     setFilter(btn.dataset.filter);
@@ -120,20 +140,30 @@ clearDoneBtn.addEventListener("click", () => {
   updateUI();
 });
 
+// Кнопка "Повторить" для стартовой загрузки
+retryBtn.addEventListener("click", () => {
+  // Сбрасываем хранилище, чтобы триггернуть загрузку заново
+  localStorage.removeItem("week6:todo-tasks");
+  fetchInitialTasks();
+});
+
 if (importBtn) {
   importBtn.addEventListener("click", async () => {
     try {
+      setStatus("loading");
+      updateUI();
+
       const externalTasks = await importFromExternalApi();
       const validTransformed = externalTasks
         .map(transformExternalTask)
         .filter(isValidTask);
 
-      for (const task of validTransformed) {
-        addTask(task);
-      }
+      validTransformed.forEach(addTask);
+      setStatus("idle");
       updateUI();
     } catch (error) {
-      alert("Не удалось импортировать задачи. Проверьте соединение.");
+      setStatus("error", "Не удалось импортировать задачи");
+      updateUI();
     }
   });
 }
