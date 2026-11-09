@@ -1,20 +1,24 @@
-export function renderStatusBlock(status, errorMessage) {
-  const statusBlock = document.getElementById("status");
-  const statusText = document.getElementById("status-text");
-  const retryBtn = document.getElementById("retry-btn");
+// Храним ID таймера для управления скрытием алерта
+let alertTimeoutId = null;
 
-  if (status === "loading") {
-    statusBlock.hidden = false;
-    statusBlock.className = "status status--loading";
-    statusText.textContent = "Загрузка...";
-    retryBtn.hidden = true;
-  } else if (status === "error") {
-    statusBlock.hidden = false;
-    statusBlock.className = "status status--error";
-    statusText.textContent = errorMessage || "Произошла ошибка";
-    retryBtn.hidden = false;
-  } else {
-    statusBlock.hidden = true;
+export function showDangerAlert(message) {
+  const alertBlock = document.getElementById("action-alert");
+  const alertText = document.getElementById("alert-text");
+
+  if (alertBlock && alertText) {
+    // Если уже есть активный таймер скрытия, сбрасываем его!
+    // Это гарантирует, что новое сообщение провисит полные 5 секунд.
+    if (alertTimeoutId) {
+      clearTimeout(alertTimeoutId);
+    }
+
+    alertBlock.className = "alert alert--danger";
+    alertText.textContent = message;
+    alertBlock.hidden = false;
+
+    alertTimeoutId = setTimeout(() => {
+      alertBlock.hidden = true;
+    }, 5000);
   }
 }
 
@@ -23,14 +27,36 @@ export function showSuccessAlert(message) {
   const alertText = document.getElementById("alert-text");
 
   if (alertBlock && alertText) {
+    if (alertTimeoutId) clearTimeout(alertTimeoutId);
+
     alertBlock.className = "alert alert--success";
     alertText.textContent = message;
     alertBlock.hidden = false;
 
-    // Автоматически скрываем через 3 секунды для хорошего UX
-    setTimeout(() => {
+    alertTimeoutId = setTimeout(() => {
       alertBlock.hidden = true;
     }, 3000);
+  }
+}
+
+// ... (остальные функции renderTasks, renderCounter, renderEmptyState, renderStatusBlock остаются без изменений)
+export function renderStatusBlock(status, errorMessage) {
+  const statusBlock = document.getElementById("status");
+  const statusText = document.getElementById("status-text");
+  const retryBtn = document.getElementById("retry-btn");
+
+  if (status === "loading") {
+    statusBlock.hidden = false;
+    statusBlock.className = "status status--loading";
+    statusText.textContent = errorMessage || "Загрузка...";
+    retryBtn.hidden = true;
+  } else if (status === "error") {
+    statusBlock.hidden = false;
+    statusBlock.className = "status status--error";
+    statusText.textContent = errorMessage || "Произошла ошибка";
+    retryBtn.hidden = false;
+  } else {
+    statusBlock.hidden = true;
   }
 }
 
