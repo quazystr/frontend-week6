@@ -1,62 +1,37 @@
-// Храним ID таймера для управления скрытием алерта
-let alertTimeoutId = null;
-
-export function showDangerAlert(message) {
-  const alertBlock = document.getElementById("action-alert");
-  const alertText = document.getElementById("alert-text");
-
-  if (alertBlock && alertText) {
-    // Если уже есть активный таймер скрытия, сбрасываем его!
-    // Это гарантирует, что новое сообщение провисит полные 5 секунд.
-    if (alertTimeoutId) {
-      clearTimeout(alertTimeoutId);
-    }
-
-    alertBlock.className = "alert alert--danger";
-    alertText.textContent = message;
-    alertBlock.hidden = false;
-
-    alertTimeoutId = setTimeout(() => {
-      alertBlock.hidden = true;
-    }, 5000);
-  }
-}
-
-export function showSuccessAlert(message) {
-  const alertBlock = document.getElementById("action-alert");
-  const alertText = document.getElementById("alert-text");
-
-  if (alertBlock && alertText) {
-    if (alertTimeoutId) clearTimeout(alertTimeoutId);
-
-    alertBlock.className = "alert alert--success";
-    alertText.textContent = message;
-    alertBlock.hidden = false;
-
-    alertTimeoutId = setTimeout(() => {
-      alertBlock.hidden = true;
-    }, 3000);
-  }
-}
-
-// ... (остальные функции renderTasks, renderCounter, renderEmptyState, renderStatusBlock остаются без изменений)
-export function renderStatusBlock(status, errorMessage) {
+export function renderStatus(status, errorMessage, importBtn, retryBtn) {
   const statusBlock = document.getElementById("status");
   const statusText = document.getElementById("status-text");
-  const retryBtn = document.getElementById("retry-btn");
+
+  if (!statusBlock || !statusText) return;
 
   if (status === "loading") {
     statusBlock.hidden = false;
     statusBlock.className = "status status--loading";
-    statusText.textContent = errorMessage || "Загрузка...";
-    retryBtn.hidden = true;
+    statusText.textContent = "Загрузка...";
+    if (retryBtn) retryBtn.hidden = true;
+
+    // Управление доступностью кнопки импорта через render, а не в обработчике!
+    if (importBtn) {
+      importBtn.disabled = true;
+      importBtn.textContent = "Импорт...";
+    }
   } else if (status === "error") {
     statusBlock.hidden = false;
     statusBlock.className = "status status--error";
     statusText.textContent = errorMessage || "Произошла ошибка";
-    retryBtn.hidden = false;
+    if (retryBtn) retryBtn.hidden = false;
+
+    if (importBtn) {
+      importBtn.disabled = false;
+      importBtn.textContent = "Импортировать задачи";
+    }
   } else {
+    // 'idle' или 'success'
     statusBlock.hidden = true;
+    if (importBtn) {
+      importBtn.disabled = false;
+      importBtn.textContent = "Импортировать задачи";
+    }
   }
 }
 
@@ -85,7 +60,6 @@ export function renderTasks(tasks, filter, listElement, template) {
       badge.textContent = priorityText;
       badge.className = `badge badge--${task.priority}`;
     }
-
     listElement.appendChild(clone);
   }
 }
@@ -102,4 +76,35 @@ export function renderEmptyState(tasks, filter, emptyElement) {
     return true;
   });
   emptyElement.hidden = filtered.length > 0;
+}
+
+// Функции для алертов (успех/ошибка действия)
+let alertTimeoutId = null;
+
+export function showDangerAlert(message) {
+  const alertBlock = document.getElementById("action-alert");
+  const alertText = document.getElementById("alert-text");
+  if (alertBlock && alertText) {
+    if (alertTimeoutId) clearTimeout(alertTimeoutId);
+    alertBlock.className = "alert alert--danger";
+    alertText.textContent = message;
+    alertBlock.hidden = false;
+    alertTimeoutId = setTimeout(() => {
+      alertBlock.hidden = true;
+    }, 5000);
+  }
+}
+
+export function showSuccessAlert(message) {
+  const alertBlock = document.getElementById("action-alert");
+  const alertText = document.getElementById("alert-text");
+  if (alertBlock && alertText) {
+    if (alertTimeoutId) clearTimeout(alertTimeoutId);
+    alertBlock.className = "alert alert--success";
+    alertText.textContent = message;
+    alertBlock.hidden = false;
+    alertTimeoutId = setTimeout(() => {
+      alertBlock.hidden = true;
+    }, 3000);
+  }
 }

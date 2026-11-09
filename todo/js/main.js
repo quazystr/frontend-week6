@@ -2,10 +2,11 @@ import { hasTasksInStorage, loadTasks, saveTasks } from "./storage.js";
 import {
   getTasks,
   getFilter,
-  getStatus,
+  getRequestStatus,
+  getErrorMessage,
   setInitialTasks,
   setFilter,
-  setStatus,
+  setRequestStatus,
   addTask,
   toggleTask,
   deleteTask,
@@ -15,14 +16,14 @@ import {
   renderTasks,
   renderCounter,
   renderEmptyState,
-  renderStatusBlock,
+  renderStatus,
   showSuccessAlert,
   showDangerAlert,
 } from "./render.js";
 import { isValidTitle, isValidTask, fromRemoteTodo } from "./validation.js";
-import { request, getNetworkErrorMessage } from "./api.js"; // <-- НОВЫЙ ИМПОРТ
+import { request, getNetworkErrorMessage } from "./api.js";
 
-// DOM
+// DOM-элементы (кэшируем один раз)
 const form = document.querySelector(".task-form");
 const titleInput = document.getElementById("task-title");
 const taskList = document.querySelector(".task-list");
@@ -34,26 +35,25 @@ const clearDoneBtn = document.querySelector(".clear-done-btn");
 const importBtn = document.querySelector(".import-btn");
 const retryBtn = document.getElementById("retry-btn");
 
+// ЕДИНАЯ ТОЧКА ОБНОВЛЕНИЯ UI
 function updateUI() {
   renderTasks(getTasks(), getFilter(), taskList, taskTemplate);
   renderCounter(getTasks(), counter);
   renderEmptyState(getTasks(), getFilter(), emptyState);
-  renderStatusBlock(getStatus(), ""); // Текст ошибки теперь в alert, здесь только статус загрузки
+
+  // Передаем состояние в render, а не манипулируем DOM здесь!
+  renderStatus(getRequestStatus(), getErrorMessage(), importBtn, retryBtn);
 
   const hasCompleted = getTasks().some((t) => t.done);
   clearDoneBtn.disabled = !hasCompleted;
-
-  if (importBtn) {
-    const isLoading = getStatus() === "loading";
-    importBtn.disabled = isLoading;
-    importBtn.textContent = isLoading ? "Импорт..." : "Импортировать задачи";
-  }
 
   saveTasks(getTasks());
 }
 
 async function fetchInitialTasks() {
-  setStatus("loading");
+  // 1. Меняем состояние
+  setRequestStatus("loading");
+  // 2. Обновляем UI (он сам покажет загрузку и заблокирует кнопки)
   updateUI();
 
   try {
@@ -61,12 +61,14 @@ async function fetchInitialTasks() {
     const validTasks = rawTasks.filter(isValidTask);
     setInitialTasks(validTasks);
     saveTasks(validTasks);
-    setStatus("idle");
+
+    setRequestStatus("idle");
     updateUI();
   } catch (error) {
     console.error("Ошибка загрузки стартовых задач:", error);
-    showDangerAlert(getNetworkErrorMessage(error)); // <-- Показываем понятную ошибку
-    setStatus("idle"); // <-- Возвращаем кнопку в доступное состояние
+    showDangerAlert(getNetworkErrorMessage(error));
+
+    setRequestStatus("idle"); // Снимаем загрузку, разблокируем кнопки
     setInitialTasks([]);
     updateUI();
   }
@@ -78,12 +80,12 @@ async function init() {
   } else {
     const savedTasks = loadTasks().filter(isValidTask);
     setInitialTasks(savedTasks);
-    setStatus("idle");
+    setRequestStatus("idle");
     updateUI();
   }
 }
 
-// --- Обработчики событий ---
+// --- ОБРАБОТЧИКИ СОБЫТИЙ (Только мутация состояния + updateUI) ---
 
 form.addEventListener("submit", (event) => {
   event.preventDefault();
@@ -98,7 +100,7 @@ form.addEventListener("submit", (event) => {
       createdAt: new Date().toISOString(),
     });
     titleInput.value = "";
-    updateUI();
+    updateUI(); // <-- Только это
   }
 });
 
@@ -106,7 +108,7 @@ taskList.addEventListener("change", (event) => {
   const checkbox = event.target.closest(".task__check");
   if (checkbox) {
     toggleTask(checkbox.closest(".task").dataset.id);
-    updateUI();
+    updateUI(); // <-- Только это
   }
 });
 
@@ -114,7 +116,7 @@ taskList.addEventListener("click", (event) => {
   const removeBtn = event.target.closest(".task__remove");
   if (removeBtn) {
     deleteTask(removeBtn.closest(".task").dataset.id);
-    updateUI();
+    updateUI(); // <-- Только это
   }
 });
 
@@ -128,29 +130,29 @@ filters.addEventListener("click", (event) => {
     btn.classList.add("filters__button--active");
     btn.setAttribute("aria-pressed", "true");
     setFilter(btn.dataset.filter);
-    updateUI();
+    updateUI(); // <-- Только это
   }
 });
 
 clearDoneBtn.addEventListener("click", () => {
   clearCompleted();
-  updateUI();
+  updateUI(); // <-- Только это
 });
 
 retryBtn.addEventListener("click", () => {
   localStorage.removeItem("week6:todo-tasks");
-  fetchInitialTasks();
+  fetchInitialTasks(); // Внутри уже есть setRequestStatus + updateUI
 });
 
 if (importBtn) {
   importBtn.addEventListener("click", async () => {
-    if (getStatus() === "loading") return;
+    // Проверка состояния, а не атрибута disabled!
+    if (getRequestStatus() === "loading") return;
 
-    setStatus("loading");
-    updateUI();
+    setRequestStatus("loading");
+    updateUI(); // <-- Кнопка заблокируется ЗДЕСЬ, а не в обработчике
 
     try {
-      // <-- Используем универсальный request
       const remoteData = await request(
         "https://jsonplaceholder.typicode.com/todos?userId=1&_limit=5",
       );
@@ -158,39 +160,34 @@ if (importBtn) {
       const transformedTasks = remoteData
         .map(fromRemoteTodo)
         .filter((task) => task !== null);
-
       const currentTasks = getTasks();
       const currentIds = new Set(currentTasks.map((t) => t.id));
 
       let addedCount = 0;
-      const trulyNewTasks = [];
-
       for (const task of transformedTasks) {
         if (!currentIds.has(task.id)) {
-          trulyNewTasks.push(task);
+          addTask(task);
           currentIds.add(task.id);
           addedCount++;
         }
       }
 
       if (addedCount > 0) {
-        for (const task of trulyNewTasks) {
-          addTask(task);
-        }
         showSuccessAlert(`Импортировано: ${addedCount}`);
       } else {
         showSuccessAlert("Новых задач нет");
       }
 
-      setStatus("idle");
+      setRequestStatus("idle");
       updateUI();
     } catch (error) {
       console.error("Ошибка импорта:", error);
-      showDangerAlert(getNetworkErrorMessage(error)); // <-- Показываем понятную ошибку
-      setStatus("idle"); // <-- Возвращаем кнопку в доступное состояние
+      showDangerAlert(getNetworkErrorMessage(error));
+      setRequestStatus("idle");
       updateUI();
     }
   });
 }
 
+// Запуск
 init();
