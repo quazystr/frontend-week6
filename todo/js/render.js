@@ -1,13 +1,3 @@
-export function renderStatus() {
-  const statusBlock = document.getElementById("status");
-  const statusText = document.getElementById("status-text");
-  const retryBtn = document.getElementById("retry-btn");
-
-  const currentStatus = window.appState.getStatus(); // Временный хак, лучше передавать аргументом, но для простоты оставим так или импортируем
-  // Правильный подход: передавать статус аргументом. Исправим в main.js.
-}
-
-// ПРАВИЛЬНЫЙ ВАРИАНТ (чистая функция):
 export function renderStatusBlock(status, errorMessage) {
   const statusBlock = document.getElementById("status");
   const statusText = document.getElementById("status-text");
@@ -16,15 +6,31 @@ export function renderStatusBlock(status, errorMessage) {
   if (status === "loading") {
     statusBlock.hidden = false;
     statusBlock.className = "status status--loading";
-    statusText.textContent = "Загрузка стартовых задач...";
+    statusText.textContent = "Загрузка...";
     retryBtn.hidden = true;
   } else if (status === "error") {
     statusBlock.hidden = false;
     statusBlock.className = "status status--error";
-    statusText.textContent = errorMessage || "Не удалось загрузить данные";
+    statusText.textContent = errorMessage || "Произошла ошибка";
     retryBtn.hidden = false;
   } else {
-    statusBlock.hidden = true; // 'idle' или 'success'
+    statusBlock.hidden = true;
+  }
+}
+
+export function showSuccessAlert(message) {
+  const alertBlock = document.getElementById("action-alert");
+  const alertText = document.getElementById("alert-text");
+
+  if (alertBlock && alertText) {
+    alertBlock.className = "alert alert--success";
+    alertText.textContent = message;
+    alertBlock.hidden = false;
+
+    // Автоматически скрываем через 3 секунды для хорошего UX
+    setTimeout(() => {
+      alertBlock.hidden = true;
+    }, 3000);
   }
 }
 
@@ -42,7 +48,6 @@ export function renderTasks(tasks, filter, listElement, template) {
     clone.querySelector(".task__check").checked = task.done;
     clone.querySelector(".task__title").textContent = task.title;
 
-    // Бейдж приоритета (если есть в твоем CSS)
     const badge = clone.querySelector(".badge");
     if (badge) {
       const priorityText =

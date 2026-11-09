@@ -14,15 +14,17 @@ export function isValidTask(task) {
   return true;
 }
 
-export function transformExternalTask(externalTask) {
-  return {
-    id: crypto.randomUUID(), // Генерируем свой ID
-    title:
-      typeof externalTask.title === "string"
-        ? externalTask.title.trim()
-        : "Без названия",
-    done: Boolean(externalTask.completed),
+export function fromRemoteTodo(item) {
+  if (!item || typeof item !== "object") return null;
+
+  const transformed = {
+    id: `remote-${item.id}`, // Строка с префиксом и номером
+    title: typeof item.title === "string" ? item.title.trim() : "",
+    done: Boolean(item.completed),
     priority: "normal",
     createdAt: new Date().toISOString(),
   };
+
+  // Если после трансформации задача не валидна, возвращаем null
+  return isValidTask(transformed) ? transformed : null;
 }

@@ -6,6 +6,7 @@ import {
   setInitialTasks,
   setFilter,
   setStatus,
+  getErrorMessage,
   addTask,
   toggleTask,
   deleteTask,
@@ -16,12 +17,9 @@ import {
   renderCounter,
   renderEmptyState,
   renderStatusBlock,
+  showSuccessAlert,
 } from "./render.js";
-import {
-  isValidTitle,
-  isValidTask,
-  transformExternalTask,
-} from "./validation.js";
+import { isValidTitle, isValidTask, fromRemoteTodo } from "./validation.js";
 import { loadInitialTasks, importFromExternalApi } from "./api.js";
 
 // DOM
@@ -36,49 +34,48 @@ const clearDoneBtn = document.querySelector(".clear-done-btn");
 const importBtn = document.querySelector(".import-btn");
 const retryBtn = document.getElementById("retry-btn");
 
-// Обновление всего UI
 function updateUI() {
   renderTasks(getTasks(), getFilter(), taskList, taskTemplate);
   renderCounter(getTasks(), counter);
   renderEmptyState(getTasks(), getFilter(), emptyState);
-  renderStatusBlock(getStatus(), window.errorMessage || ""); // Передаем текущий статус
+  renderStatusBlock(getStatus(), getErrorMessage());
 
   const hasCompleted = getTasks().some((t) => t.done);
   clearDoneBtn.disabled = !hasCompleted;
 
-  // Сохраняем при любом изменении
+  // Управление состоянием кнопки импорта
+  if (importBtn) {
+    const isLoading = getStatus() === "loading";
+    importBtn.disabled = isLoading;
+    importBtn.textContent = isLoading ? "Импорт..." : "Импортировать задачи";
+  }
+
   saveTasks(getTasks());
 }
 
-// Логика загрузки стартовых задач
 async function fetchInitialTasks() {
-  setStatus("loading");
-  updateUI(); // Показываем "Загрузка...", форма при этом остается активной
+  setStatus("loading", "Загрузка стартовых задач...");
+  updateUI();
 
   try {
     const rawTasks = await loadInitialTasks();
     const validTasks = rawTasks.filter(isValidTask);
-
     setInitialTasks(validTasks);
     saveTasks(validTasks);
-
     setStatus("idle");
     updateUI();
   } catch (error) {
     console.error("Ошибка загрузки стартовых задач:", error);
     setStatus("error", "Не удалось загрузить стартовые задачи");
-    setInitialTasks([]); // Приложение работает с пустым списком
+    setInitialTasks([]);
     updateUI();
   }
 }
 
-// Инициализация приложения
 async function init() {
-  // КЛЮЧЕВОЕ УСЛОВИЕ: если ключа нет ВОВСЕ
   if (!hasTasksInStorage()) {
     await fetchInitialTasks();
   } else {
-    // Ключ есть (даже если там '[]') - не запрашиваем сервер
     const savedTasks = loadTasks().filter(isValidTask);
     setInitialTasks(savedTasks);
     setStatus("idle");
@@ -140,28 +137,57 @@ clearDoneBtn.addEventListener("click", () => {
   updateUI();
 });
 
-// Кнопка "Повторить" для стартовой загрузки
 retryBtn.addEventListener("click", () => {
-  // Сбрасываем хранилище, чтобы триггернуть загрузку заново
   localStorage.removeItem("week6:todo-tasks");
   fetchInitialTasks();
 });
 
+// ОБРАБОТЧИК ИМПОРТА
 if (importBtn) {
   importBtn.addEventListener("click", async () => {
+    // 1. Защита от двойного клика: если уже грузим, игнорируем нажатие
+    if (getStatus() === "loading") return;
+
+    setStatus("loading");
+    updateUI(); // Кнопка станет disabled и текст сменится на "Импорт..."
+
     try {
-      setStatus("loading");
-      updateUI();
+      const remoteData = await importFromExternalApi();
 
-      const externalTasks = await importFromExternalApi();
-      const validTransformed = externalTasks
-        .map(transformExternalTask)
-        .filter(isValidTask);
+      // 2. Трансформация и отсев невалидных (null)
+      const transformedTasks = remoteData
+        .map(fromRemoteTodo)
+        .filter((task) => task !== null);
 
-      validTransformed.forEach(addTask);
+      // 3. Дедупликация: проверяем, каких ID ещё нет в нашем списке
+      const currentTasks = getTasks();
+      const currentIds = new Set(currentTasks.map((t) => t.id));
+
+      let addedCount = 0;
+      const trulyNewTasks = [];
+
+      for (const task of transformedTasks) {
+        if (!currentIds.has(task.id)) {
+          trulyNewTasks.push(task);
+          currentIds.add(task.id); // обновляем Set, чтобы не добавить дубликаты из самого импорта
+          addedCount++;
+        }
+      }
+
+      // 4. Добавление и уведомление
+      if (addedCount > 0) {
+        for (const task of trulyNewTasks) {
+          addTask(task);
+        }
+        showSuccessAlert(`Импортировано: ${addedCount}`);
+      } else {
+        showSuccessAlert("Новых задач нет");
+      }
+
       setStatus("idle");
       updateUI();
     } catch (error) {
+      console.error("Ошибка импорта:", error);
       setStatus("error", "Не удалось импортировать задачи");
       updateUI();
     }

@@ -8,7 +8,7 @@ export async function loadInitialTasks() {
 
 export async function importFromExternalApi() {
   const response = await fetch(
-    "https://jsonplaceholder.typicode.com/todos?_limit=5",
+    "https://jsonplaceholder.typicode.com/todos?userId=1&_limit=5",
   );
   if (!response.ok) {
     throw new Error(`Ошибка импорта: ${response.status}`);
