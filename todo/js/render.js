@@ -1,3 +1,4 @@
+import { isTaskPending } from "./state.js";
 export function renderStatus(status, errorMessage, importBtn, retryBtn) {
   const statusBlock = document.getElementById("status");
   const statusText = document.getElementById("status-text");
@@ -46,7 +47,16 @@ export function renderTasks(tasks, filter, listElement, template) {
   for (const task of filtered) {
     const clone = template.content.firstElementChild.cloneNode(true);
     clone.dataset.id = task.id;
-    clone.querySelector(".task__check").checked = task.done;
+
+    // Добавляем модификатор и блокируем элементы, если задача в ожидании
+    if (isTaskPending(task.id)) {
+      clone.classList.add("task--pending");
+    }
+
+    const checkbox = clone.querySelector(".task__check");
+    checkbox.checked = task.done;
+    checkbox.disabled = isTaskPending(task.id); // Блокируем чекбокс
+
     clone.querySelector(".task__title").textContent = task.title;
 
     const badge = clone.querySelector(".badge");
@@ -60,6 +70,10 @@ export function renderTasks(tasks, filter, listElement, template) {
       badge.textContent = priorityText;
       badge.className = `badge badge--${task.priority}`;
     }
+
+    const removeBtn = clone.querySelector(".task__remove");
+    removeBtn.disabled = isTaskPending(task.id); // Блокируем кнопку удаления
+
     listElement.appendChild(clone);
   }
 }

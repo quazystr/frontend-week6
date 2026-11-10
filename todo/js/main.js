@@ -11,6 +11,8 @@ import {
   toggleTask,
   deleteTask,
   clearCompleted,
+  setTaskPending,
+  isTaskPending,
 } from "./state.js";
 import {
   renderTasks,
@@ -21,7 +23,13 @@ import {
   showDangerAlert,
 } from "./render.js";
 import { isValidTitle, isValidTask, fromRemoteTodo } from "./validation.js";
-import { request, getNetworkErrorMessage } from "./api.js";
+import {
+  request,
+  getNetworkErrorMessage,
+  createRemoteTask,
+  updateRemoteTask,
+  deleteRemoteTask,
+} from "./api.js";
 
 // DOM-элементы (кэшируем один раз)
 const form = document.querySelector(".task-form");
@@ -87,36 +95,85 @@ async function init() {
 
 // --- ОБРАБОТЧИКИ СОБЫТИЙ (Только мутация состояния + updateUI) ---
 
-form.addEventListener("submit", (event) => {
+form.addEventListener("submit", async (event) => {
   event.preventDefault();
   const title = titleInput.value;
 
   if (isValidTitle(title)) {
-    addTask({
+    const newTask = {
       id: crypto.randomUUID(),
       title: title.trim(),
       done: false,
       priority: "normal",
       createdAt: new Date().toISOString(),
-    });
+    };
+
+    // Оптимистичное обновление
+    addTask(newTask);
+    setTaskPending(newTask.id, true);
     titleInput.value = "";
-    updateUI(); // <-- Только это
+    updateUI();
+
+    try {
+      await createRemoteTask(newTask);
+    } catch (error) {
+      // Откат при ошибке
+      deleteTask(newTask.id);
+      showDangerAlert("Не удалось сохранить задачу. Проверьте соединение.");
+    } finally {
+      setTaskPending(newTask.id, false);
+      updateUI();
+    }
   }
 });
 
-taskList.addEventListener("change", (event) => {
+taskList.addEventListener("change", async (event) => {
   const checkbox = event.target.closest(".task__check");
-  if (checkbox) {
-    toggleTask(checkbox.closest(".task").dataset.id);
-    updateUI(); // <-- Только это
+  if (!checkbox) return;
+  const taskId = checkbox.closest(".task").dataset.id;
+
+  if (isTaskPending(taskId)) return; // Защита от двойного клика
+
+  // Оптимистичное обновление
+  toggleTask(taskId);
+  setTaskPending(taskId, true);
+  updateUI();
+
+  try {
+    const task = getTasks().find((t) => t.id === taskId);
+    await updateRemoteTask(taskId, task.done);
+  } catch (error) {
+    // Откат при ошибке
+    toggleTask(taskId); // Возвращаем как было
+    showDangerAlert("Не удалось обновить задачу. Проверьте соединение.");
+  } finally {
+    setTaskPending(taskId, false);
+    updateUI();
   }
 });
 
-taskList.addEventListener("click", (event) => {
+taskList.addEventListener("click", async (event) => {
   const removeBtn = event.target.closest(".task__remove");
-  if (removeBtn) {
-    deleteTask(removeBtn.closest(".task").dataset.id);
-    updateUI(); // <-- Только это
+  if (!removeBtn) return;
+  const taskId = removeBtn.closest(".task").dataset.id;
+
+  if (isTaskPending(taskId)) return;
+
+  // Оптимистичное обновление (сохраняем задачу для возможного отката)
+  const taskToDelete = getTasks().find((t) => t.id === taskId);
+  deleteTask(taskId);
+  setTaskPending(taskId, true);
+  updateUI();
+
+  try {
+    await deleteRemoteTask(taskId);
+  } catch (error) {
+    // Откат при ошибке
+    addTask(taskToDelete);
+    showDangerAlert("Не удалось удалить задачу. Проверьте соединение.");
+  } finally {
+    setTaskPending(taskId, false);
+    updateUI();
   }
 });
 

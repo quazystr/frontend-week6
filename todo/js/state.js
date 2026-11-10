@@ -47,3 +47,14 @@ export function deleteTask(id) {
 export function clearCompleted() {
   tasks = tasks.filter((t) => !t.done);
 }
+
+let pendingTaskIds = new Set();
+
+export function setTaskPending(id, isPending) {
+  if (isPending) pendingTaskIds.add(id);
+  else pendingTaskIds.delete(id);
+}
+
+export function isTaskPending(id) {
+  return pendingTaskIds.has(id);
+}
