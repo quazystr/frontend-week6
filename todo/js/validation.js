@@ -18,13 +18,13 @@ export function fromRemoteTodo(item) {
   if (!item || typeof item !== "object") return null;
 
   const transformed = {
-    id: `remote-${item.id}`, // Строка с префиксом и номером
+    id: `remote-${item.id}`,
     title: typeof item.title === "string" ? item.title.trim() : "",
-    done: Boolean(item.completed),
+    // ✅ ИСПРАВЛЕНИЕ: строгая проверка типа boolean
+    done: item.completed === true, // Только если это именно true, иначе false
     priority: "normal",
     createdAt: new Date().toISOString(),
   };
 
-  // Если после трансформации задача не валидна, возвращаем null
   return isValidTask(transformed) ? transformed : null;
 }

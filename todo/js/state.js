@@ -58,3 +58,7 @@ export function setTaskPending(id, isPending) {
 export function isTaskPending(id) {
   return pendingTaskIds.has(id);
 }
+
+export function getPendingIds() {
+  return new Set(pendingTaskIds); // Возвращаем копию, а не ссылку
+}

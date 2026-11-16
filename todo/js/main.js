@@ -3,6 +3,7 @@ import {
   getTasks,
   getFilter,
   getRequestStatus,
+  getPendingIds,
   getErrorMessage,
   setInitialTasks,
   setFilter,
@@ -45,11 +46,16 @@ const retryBtn = document.getElementById("retry-btn");
 
 // ЕДИНАЯ ТОЧКА ОБНОВЛЕНИЯ UI
 function updateUI() {
-  renderTasks(getTasks(), getFilter(), taskList, taskTemplate);
+  // ✅ Передаём копию массива и копию множества ID
+  renderTasks(
+    [...getTasks()], // Копия массива
+    getPendingIds(), // Копия множества
+    getFilter(),
+    taskList,
+    taskTemplate,
+  );
   renderCounter(getTasks(), counter);
   renderEmptyState(getTasks(), getFilter(), emptyState);
-
-  // Передаем состояние в render, а не манипулируем DOM здесь!
   renderStatus(getRequestStatus(), getErrorMessage(), importBtn, retryBtn);
 
   const hasCompleted = getTasks().some((t) => t.done);

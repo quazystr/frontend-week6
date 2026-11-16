@@ -1,24 +1,25 @@
-import { isTaskPending } from "./state.js";
 export function renderStatus(status, errorMessage, importBtn, retryBtn) {
   const statusBlock = document.getElementById("status");
   const statusText = document.getElementById("status-text");
 
   if (!statusBlock || !statusText) return;
 
+  // Сбрасываем все модификаторы состояния перед установкой нового
+  statusBlock.classList.remove("status--loading", "status--error");
+
   if (status === "loading") {
     statusBlock.hidden = false;
-    statusBlock.className = "status status--loading";
+    statusBlock.classList.add("status--loading"); // Добавляем только модификатор
     statusText.textContent = "Загрузка...";
     if (retryBtn) retryBtn.hidden = true;
 
-    // Управление доступностью кнопки импорта через render, а не в обработчике!
     if (importBtn) {
       importBtn.disabled = true;
       importBtn.textContent = "Импорт...";
     }
   } else if (status === "error") {
     statusBlock.hidden = false;
-    statusBlock.className = "status status--error";
+    statusBlock.classList.add("status--error"); // Добавляем только модификатор
     statusText.textContent = errorMessage || "Произошла ошибка";
     if (retryBtn) retryBtn.hidden = false;
 
@@ -36,8 +37,9 @@ export function renderStatus(status, errorMessage, importBtn, retryBtn) {
   }
 }
 
-export function renderTasks(tasks, filter, listElement, template) {
+export function renderTasks(tasks, pendingIds, filter, listElement, template) {
   listElement.replaceChildren();
+
   const filtered = tasks.filter((t) => {
     if (filter === "active") return !t.done;
     if (filter === "done") return t.done;
@@ -48,14 +50,15 @@ export function renderTasks(tasks, filter, listElement, template) {
     const clone = template.content.firstElementChild.cloneNode(true);
     clone.dataset.id = task.id;
 
-    // Добавляем модификатор и блокируем элементы, если задача в ожидании
-    if (isTaskPending(task.id)) {
+    const isPending = pendingIds.has(task.id);
+
+    if (isPending) {
       clone.classList.add("task--pending");
     }
 
     const checkbox = clone.querySelector(".task__check");
     checkbox.checked = task.done;
-    checkbox.disabled = isTaskPending(task.id); // Блокируем чекбокс
+    checkbox.disabled = isPending;
 
     clone.querySelector(".task__title").textContent = task.title;
 
@@ -68,11 +71,14 @@ export function renderTasks(tasks, filter, listElement, template) {
             ? "Низкий"
             : "Обычный";
       badge.textContent = priorityText;
-      badge.className = `badge badge--${task.priority}`;
+
+      // ✅ ИСПРАВЛЕНИЕ: убираем старые модификаторы приоритета и добавляем новый
+      badge.classList.remove("badge--low", "badge--normal", "badge--high");
+      badge.classList.add(`badge--${task.priority}`);
     }
 
     const removeBtn = clone.querySelector(".task__remove");
-    removeBtn.disabled = isTaskPending(task.id); // Блокируем кнопку удаления
+    removeBtn.disabled = isPending;
 
     listElement.appendChild(clone);
   }
@@ -98,11 +104,17 @@ let alertTimeoutId = null;
 export function showDangerAlert(message) {
   const alertBlock = document.getElementById("action-alert");
   const alertText = document.getElementById("alert-text");
+
   if (alertBlock && alertText) {
     if (alertTimeoutId) clearTimeout(alertTimeoutId);
-    alertBlock.className = "alert alert--danger";
+
+    // ✅ ИСПРАВЛЕНИЕ: управление через classList
+    alertBlock.classList.remove("alert--success", "alert--danger");
+    alertBlock.classList.add("alert--danger");
+
     alertText.textContent = message;
     alertBlock.hidden = false;
+
     alertTimeoutId = setTimeout(() => {
       alertBlock.hidden = true;
     }, 5000);
@@ -112,11 +124,17 @@ export function showDangerAlert(message) {
 export function showSuccessAlert(message) {
   const alertBlock = document.getElementById("action-alert");
   const alertText = document.getElementById("alert-text");
+
   if (alertBlock && alertText) {
     if (alertTimeoutId) clearTimeout(alertTimeoutId);
-    alertBlock.className = "alert alert--success";
+
+    // ✅ ИСПРАВЛЕНИЕ: управление через classList
+    alertBlock.classList.remove("alert--success", "alert--danger");
+    alertBlock.classList.add("alert--success");
+
     alertText.textContent = message;
     alertBlock.hidden = false;
+
     alertTimeoutId = setTimeout(() => {
       alertBlock.hidden = true;
     }, 3000);
