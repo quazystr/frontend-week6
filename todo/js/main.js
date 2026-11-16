@@ -82,7 +82,9 @@ async function fetchInitialTasks() {
       showDangerAlert(errorMsg);
     }
 
-    setRequestStatus("idle"); // Снимаем загрузку, разблокируем кнопки
+    // ✅ ИСПРАВЛЕНИЕ: Устанавливаем статус 'error', а не 'idle'
+    // Это гарантирует, что renderStatus покажет блок .status с кнопкой "Повторить"
+    setRequestStatus("error", errorMsg || "Не удалось загрузить задачи");
     setInitialTasks([]);
     updateUI();
   }
