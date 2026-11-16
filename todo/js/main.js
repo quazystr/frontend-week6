@@ -75,7 +75,12 @@ async function fetchInitialTasks() {
     updateUI();
   } catch (error) {
     console.error("Ошибка загрузки стартовых задач:", error);
-    showDangerAlert(getNetworkErrorMessage(error));
+    const errorMsg = getNetworkErrorMessage(error);
+
+    // Показываем алерт только если это не тихая отмена (ABORT)
+    if (errorMsg) {
+      showDangerAlert(errorMsg);
+    }
 
     setRequestStatus("idle"); // Снимаем загрузку, разблокируем кнопки
     setInitialTasks([]);

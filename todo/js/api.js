@@ -32,10 +32,19 @@ export async function request(path, options = {}) {
     if (response.status === 204) return null;
     return await response.json();
   } catch (error) {
-    // Стандартизируем ошибки для простоты обработки в main.js
-    if (error.name === "AbortError") throw new Error("TIMEOUT");
-    if (error.name === "TypeError") throw new Error("NETWORK");
-    if (error.name === "SyntaxError") throw new Error("SYNTAX");
+    // ✅ ИСПРАВЛЕНИЕ: Разделяем таймаут и ручную отмену
+    if (error.name === "TimeoutError") {
+      throw new Error("TIMEOUT");
+    }
+    if (error.name === "AbortError") {
+      throw new Error("ABORT");
+    }
+    if (error.name === "TypeError") {
+      throw new Error("NETWORK");
+    }
+    if (error.name === "SyntaxError") {
+      throw new Error("SYNTAX");
+    }
 
     // Пробрасываем ошибки сервера (с status) как есть
     throw error;
@@ -43,13 +52,16 @@ export async function request(path, options = {}) {
 }
 
 export function getNetworkErrorMessage(error) {
+  // ✅ ИСПРАВЛЕНИЕ: Возвращаем null для ABORT, чтобы UI знал, что ошибку показывать НЕ НАДО
+  if (error.message === "ABORT") return null;
+
   if (error.message === "TIMEOUT") return "Сервер не ответил вовремя";
   if (error.message === "NETWORK") return "Нет соединения с сервером";
   if (error.message === "SYNTAX") return "Сервер прислал испорченные данные";
   if (error.status) return `Ошибка сервера: ${error.status}`;
+
   return "Произошла неизвестная ошибка";
 }
-
 // ==========================================
 // ФУНКЦИИ ДЛЯ БОНУСНОГО ЗАДАНИЯ (Синхронизация)
 // ==========================================
