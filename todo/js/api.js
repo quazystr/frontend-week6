@@ -6,7 +6,8 @@ export async function request(path, options = {}) {
 
   // 🛡 ИСПРАВЛЕННАЯ ЛОГИКА ОПРЕДЕЛЕНИЯ URL:
   let url;
-  if (path.startsWith(".") || path.startsWith("http")) {
+  // ✅ ИСПРАВЛЕНИЕ: теперь проверяем './' вместо просто '.'
+  if (path.startsWith("./") || path.startsWith("http")) {
     // Локальный файл (data/tasks.json) или уже полный URL
     url = path;
   } else {

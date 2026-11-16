@@ -65,7 +65,8 @@ async function fetchInitialTasks() {
   updateUI();
 
   try {
-    const rawTasks = await request("data/tasks.json");
+    // ✅ ИСПРАВЛЕНИЕ: добавили './' в начале пути
+    const rawTasks = await request("./data/tasks.json");
     const validTasks = rawTasks.filter(isValidTask);
     setInitialTasks(validTasks);
     saveTasks(validTasks);
